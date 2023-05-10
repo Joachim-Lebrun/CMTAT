@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 
 import "../../../../openzeppelin-contracts-upgradeable/contracts/security/PausableUpgradeable.sol";
 import "../../../../openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
-import "../optional/AuthorizationModule.sol";
+import "../../security/AuthorizationModule.sol";
 import "../../internal/EnforcementModuleInternal.sol";
 
 /**
@@ -12,28 +12,32 @@ import "../../internal/EnforcementModuleInternal.sol";
  *
  * Allows the issuer to freeze transfers from a given address
  */
-abstract contract EnforcementModule is EnforcementModuleInternal,
-    AuthorizationModule {
+abstract contract EnforcementModule is
+    EnforcementModuleInternal,
+    AuthorizationModule
+{
+    string internal constant TEXT_TRANSFER_REJECTED_FROM_FROZEN =
+        "The address FROM is frozen";
 
-    bytes32 public constant ENFORCER_ROLE = keccak256("ENFORCER_ROLE");
-    string internal constant TEXT_TRANSFER_REJECTED_FROZEN =
-        "The address is frozen";
+    string internal constant TEXT_TRANSFER_REJECTED_TO_FROZEN =
+        "The address TO is frozen";
 
-    function __EnforcementModule_init() internal onlyInitializing {
+    function __EnforcementModule_init(address admin) internal onlyInitializing {
         /* OpenZeppelin */
         __Context_init_unchained();
         // AccessControlUpgradeable inherits from ERC165Upgradeable
         __ERC165_init_unchained();
         // AuthorizationModule inherits from AccessControlUpgradeable
         __AccessControl_init_unchained();
-        
-        /* Internal */
-        __Enforcement_init_unchained();
-        
-        /* Wrapper */
-        __AuthorizationModule_init_unchained();
 
-        /* own function */
+        /* CMTAT modules */
+        // Internal
+        __Enforcement_init_unchained();
+
+        // Security
+        __AuthorizationModule_init_unchained(admin);
+
+        // own function
         __EnforcementModule_init_unchained();
     }
 
@@ -42,27 +46,29 @@ abstract contract EnforcementModule is EnforcementModuleInternal,
     }
 
     /**
-     * @dev Freezes an address.
-     *
+     * @notice Freezes an address.
+     * @param account the account to freeze
+     * @param reason indicate why the account was frozen.
      */
-    function freeze(address account)
-        public
-        onlyRole(ENFORCER_ROLE)
-        returns (bool)
-    {
-        return _freeze(account);
+    function freeze(
+        address account,
+        string memory reason
+    ) public onlyRole(ENFORCER_ROLE) returns (bool) {
+        return _freeze(account, reason);
     }
 
     /**
-     * @dev Unfreezes an address.
+     * @notice Unfreezes an address.
+     * @param account the account to unfreeze
+     * @param reason indicate why the account was unfrozen.
+     *
      *
      */
-    function unfreeze(address account)
-        public
-        onlyRole(ENFORCER_ROLE)
-        returns (bool)
-    {
-        return _unfreeze(account);
+    function unfreeze(
+        address account,
+        string memory reason
+    ) public onlyRole(ENFORCER_ROLE) returns (bool) {
+        return _unfreeze(account, reason);
     }
 
     uint256[50] private __gap;

@@ -1,16 +1,15 @@
-const { expectEvent, expectRevert } = require('@openzeppelin/test-helpers')
-const { should } = require('chai').should()
-const { ENFORCER_ROLE } = require('../../utils')
 
-const CMTAT = artifacts.require('CMTAT')
+const CMTAT = artifacts.require('CMTAT_STANDALONE')
 const EnforcementModuleCommon = require('../../common/EnforcementModuleCommon')
+const { ZERO_ADDRESS } = require('../../utils')
 
 contract(
   'Standard - EnforcementModule',
-  function ([_, admin, address1, address2]) {
+  function ([_, admin, address1, address2, address3, randomDeployer]) {
     beforeEach(async function () {
-      this.cmtat = await CMTAT.new(_, false, admin, 'CMTA Token', 'CMTAT', 'CMTAT_ISIN', 'https://cmta.ch', { from: admin })
+      this.flag = 5
+      this.cmtat = await CMTAT.new(_, admin, 'CMTA Token', 'CMTAT', 'CMTAT_ISIN', 'https://cmta.ch', ZERO_ADDRESS, 'CMTAT_info', this.flag, { from: randomDeployer })
     })
 
-    EnforcementModuleCommon(admin, address1, address2)
+    EnforcementModuleCommon(admin, address1, address2, address3)
   })

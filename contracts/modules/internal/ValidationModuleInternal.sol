@@ -4,39 +4,46 @@ pragma solidity ^0.8.17;
 
 import "../../../openzeppelin-contracts-upgradeable/contracts/utils/ContextUpgradeable.sol";
 import "../../../openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
-import "../../interfaces/IRuleEngine.sol";
+import "../../interfaces/IEIP1404/IEIP1404Wrapper.sol";
 
 /**
  * @dev Validation module.
  *
  * Useful for to restrict and validate transfers
  */
-abstract contract ValidationModuleInternal is Initializable, ContextUpgradeable {
+abstract contract ValidationModuleInternal is
+    Initializable,
+    ContextUpgradeable
+{
     /**
      * @dev Emitted when a rule engine is set.
      */
-    event RuleEngineSet(address indexed newRuleEngine);
+    event RuleEngine(IEIP1404Wrapper indexed newRuleEngine);
 
-    IRuleEngine public ruleEngine;
+    IEIP1404Wrapper public ruleEngine;
 
     /**
      * @dev Initializes the contract with rule engine.
      */
-    function __Validation_init(IRuleEngine ruleEngine_) internal onlyInitializing {
+    function __Validation_init(
+        IEIP1404Wrapper ruleEngine_
+    ) internal onlyInitializing {
         __Context_init_unchained();
         __Validation_init_unchained(ruleEngine_);
     }
 
-    function __Validation_init_unchained(IRuleEngine ruleEngine_)
-        internal
-        onlyInitializing
-    {
+    function __Validation_init_unchained(
+        IEIP1404Wrapper ruleEngine_
+    ) internal onlyInitializing {
         if (address(ruleEngine_) != address(0)) {
             ruleEngine = ruleEngine_;
-            emit RuleEngineSet(address(ruleEngine));
+            emit RuleEngine(ruleEngine);
         }
     }
 
+    /**
+    @dev before making a call to this function, you have to check if a ruleEngine is set.
+    */
     function _validateTransfer(
         address from,
         address to,
@@ -45,14 +52,18 @@ abstract contract ValidationModuleInternal is Initializable, ContextUpgradeable 
         return ruleEngine.validateTransfer(from, to, amount);
     }
 
-    function _messageForTransferRestriction(uint8 restrictionCode)
-        internal
-        view
-        returns (string memory)
-    {
+    /**
+    @dev before making a call to this function, you have to check if a ruleEngine is set.
+    */
+    function _messageForTransferRestriction(
+        uint8 restrictionCode
+    ) internal view returns (string memory) {
         return ruleEngine.messageForTransferRestriction(restrictionCode);
     }
 
+    /**
+    @dev before making a call to this function, you have to check if a ruleEngine is set.
+    */
     function _detectTransferRestriction(
         address from,
         address to,
