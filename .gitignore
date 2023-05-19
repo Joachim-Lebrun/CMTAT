@@ -2,8 +2,16 @@ node_modules
 build
 coverage
 coverage.json
+#exception
+!doc/general/test/coverage
 /.openzeppelin
 .vscode/
+#PlantUML
+out
 #drawio
 *.bkp
 *.dtmp
+artifacts
+cache
+#manticore
+mcore_*

@@ -55,7 +55,6 @@ contract CMTAT_KILL_TEST is
         _disableInitializers();
     }
 
-
     /**
     @notice 
     initialize the proxy contract
@@ -142,9 +141,8 @@ contract CMTAT_KILL_TEST is
         __CMTAT_init_unchained();
     }
 
-    function __CMTAT_init_unchained(
-    ) internal onlyInitializing {
-       // no variable to initialize
+    function __CMTAT_init_unchained() internal onlyInitializing {
+        // no variable to initialize
     }
 
     /**
@@ -184,8 +182,11 @@ contract CMTAT_KILL_TEST is
         address from,
         address to,
         uint256 amount
-    ) internal override(ERC20Upgradeable) view {
-        require(ValidationModule.validateTransfer(from, to, amount), "CMTAT: transfer rejected by validation module");
+    ) internal view override(ERC20Upgradeable) {
+        require(
+            ValidationModule.validateTransfer(from, to, amount),
+            "CMTAT: transfer rejected by validation module"
+        );
         // We call the SnapshotModule only if the transfer is valid
         /*
         SnapshotModule:

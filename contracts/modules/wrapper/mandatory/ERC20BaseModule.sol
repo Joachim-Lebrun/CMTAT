@@ -77,7 +77,8 @@ abstract contract ERC20BaseModule is ERC20Upgradeable {
         uint256 amount
     ) public virtual override returns (bool) {
         bool result = super.transferFrom(sender, recipient, amount);
-        if (result == true) {
+        // The result will be normally always true because OpenZeppelin uses require to check all the conditions.
+        if (result) {
             emit Spend(sender, _msgSender(), amount);
         }
 

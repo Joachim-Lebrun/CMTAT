@@ -7,13 +7,20 @@ import "./interfaces/IRuleEngine.sol";
 import "./RuleMock.sol";
 import "./CodeList.sol";
 
-contract RuleEngineMock is IRuleEngine, CodeList {
+/*
+@title a mock for testing, not suitable for production
+*/
+contract RuleEngineMock is IRuleEngine {
     IRule[] internal _rules;
 
     constructor() {
         _rules.push(new RuleMock());
     }
 
+    /*
+    @dev 
+    Warning: if you want to use this mock, you have to restrict the access to this function through an an access control
+    */
     function setRules(IRule[] calldata rules_) external override {
         _rules = rules_;
     }
